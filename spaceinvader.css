@@ -1,0 +1,35 @@
+#spaceship{
+    position: absolute;
+    bottom: 1%;
+    left: 50%;
+    background-image: url("spaceship.png");
+    background-size: cover;
+    width: 5%;
+    height: 5%;
+}
+
+
+.bullet{
+    position:absolute;
+    background-image: url("bullet.png");
+    background-size: cover;
+    height: 5%;
+    width:1%;
+}
+
+
+.alien{
+    position: absolute;
+    height: 5%;
+    width:1%;
+}
+
+.alienrow{
+    position: relative;
+    /* width: fit-content; */
+}
+
+body{
+    background-color: #31133B;
+    text-align: center;
+}
