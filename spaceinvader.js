@@ -1,9 +1,11 @@
+//html element accessor
+
 const spaceship=document.querySelector("#spaceship");
 const gameframe=document.querySelector(".gameframe");
+gameframe.style.height=window.innerHeight+"px";
+const shootaudio=document.querySelector("#shoot");
 const scorearea=document.querySelector(".score");
-let score=0;
-let bulletspeed=10;
-let bulletsize=2;
+scorearea.style.height=window.innerHeight+"px";
 const scordisplayer=document.querySelector("#scoredisplayer");
 const pausediv=document.createElement("div");
 pausediv.style.position="absolute";
@@ -13,6 +15,14 @@ pausediv.style.top="45%";
 pausediv.style.left="35%";
 pausediv.innerText="Jeu en pause";
 const lifedisplayer=document.querySelector("#availaiblelife");
+const audioboum=document.querySelector("#boum");
+const themeplayer=document.querySelector('#music');
+
+//game variable
+
+let score=0;
+let bulletspeed=10;
+let bulletsize=2;
 let ennemyspeed=1;
 let spawpaused=false;
 let lvlwave=0;
@@ -24,6 +34,7 @@ const bonustypes=["larger","faster","life"];
 let alienrows=[];
 let bonuss=[];
 let activbonuss=[];
+let startedplaying=false;
 const spaceshipspeed=20;
 const numberalien=10;
 const spawntime=10000; 
@@ -32,8 +43,16 @@ const aliensize=50;
 let paused=false;
 
 
-
-
+document.addEventListener('keydown', event=> {
+    if(event.code === 'Space'){
+        if(startedplaying)
+            event.preventDefault();
+        else{
+            startedplaying=true;
+            themeplayer.play();
+        }   
+    }
+});
 
 const intersect=(entity1,entity2)=>{
     const rect1 = entity1.getBoundingClientRect();
@@ -78,10 +97,10 @@ scorearea.style.height=window.innerHeight;
 
 document.addEventListener("keydown",event=>{
     switch(event.key){
-        case "ArrowRight":
+        case "d":
             keypressed="rigth";
             break;
-        case "ArrowLeft":
+        case "q":
             keypressed="left";
             break;
         case " ":   
@@ -107,10 +126,10 @@ document.addEventListener("keydown",event=>{
 
 document.addEventListener("keyup",event=>{
     switch(event.key){
-        case "ArrowRight":
+        case "d":
             keypressed=null;
             break;
-        case "ArrowLeft":
+        case "q":
             keypressed=null;
             break;
         default:
@@ -167,6 +186,7 @@ const gameplayloop=()=>{
                                 const expls=document.createElement("div");
                                 expls.className="alien";
                                 expls.innerHTML="<img src='explosion.png' width='"+aliensize+"' heigth='"+aliensize+"' >"
+                                audioboum.play();
                                 expls.style.left=entity.style.left;
                                 expls.style.top=entity.style.top;
                                 setTimeout(()=>expls.remove(),200);
@@ -225,7 +245,7 @@ const gameplayloop=()=>{
                     bonusdiv.remove();
                 }
             }
-
+            //TODO passer en for(i)
             alienrows.forEach(entity=>{
                 const row=entity.aliendiv;
                 row.forEach(alien=>{
@@ -310,11 +330,14 @@ const spawn=setInterval(spawner,spawntime);
 
 const shooting=()=>{
     if(pv>0&&!paused){
+        shootaudio.pause();
+        shootaudio.currentTime = 0;
         const bullet=document.createElement("div");
         bullet.className="bullet";
         bullet.innerHTML="<img src='bullet.png' width='"+bulletsize+"'>";
         bullet.style.top=parseInt(window.getComputedStyle(spaceship).top)-10+"px";
         bullet.style.left=parseInt(window.getComputedStyle(spaceship).left)+parseInt(window.getComputedStyle(spaceship).width)/2+"px";
+        shootaudio.play();
         bullets.push(bullet);
         gameframe.append(bullet);
         setTimeout(()=>shoot=false,shootdelay);

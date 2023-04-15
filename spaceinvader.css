@@ -8,6 +8,11 @@
     height: 5%;
 }
 
+#music{
+    position:absolute;
+    top:90%;
+}
+
 .score{
     position: relative;
     width:30%;
