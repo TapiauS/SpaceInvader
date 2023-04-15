@@ -9,8 +9,13 @@
 }
 
 .score{
+    position: relative;
     width:30%;
     height:900px;
+}
+
+.bonus{
+    position:absolute;
 }
 
 
