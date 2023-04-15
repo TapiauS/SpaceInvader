@@ -1,13 +1,22 @@
 const spaceship=document.querySelector("#spaceship");
-let ennemyspeed=5;
+const gameframe=document.querySelector(".gameframe");
+const scorearea=document.querySelector(".score");
+let score=0;
+const scordisplayer=document.querySelector("#scoredisplayer");
+const lifedisplayer=document.querySelector("#availaiblelife");
+let ennemyspeed=1;
+let spawpaused=false;
+let lvlwave=0;
+const shootdelay=200;
 let keypressed=null;
 let shoot=false;
 let bullets=[];
-let aliens=[];
 let alienrows=[];
-let spawntime=1000; 
+const spaceshipspeed=20;
+const numberalien=10;
+const spawntime=10000; 
 let pv=10;
-const aliensize=30;
+const aliensize=50;
 
 class Alienrow{
     constructor(aliendiv){
@@ -16,11 +25,8 @@ class Alienrow{
     };
 };
 
-
-
-
-
-
+gameframe.style.height=window.innerHeight;
+scorearea.style.height=window.innerHeight;
 
 document.addEventListener("keydown",event=>{
     switch(event.key){
@@ -29,6 +35,7 @@ document.addEventListener("keydown",event=>{
             break;
         case "ArrowLeft":
             keypressed="left";
+            console.log("key pressed="+keypressed)
             break;
         case " ":   
             if(!shoot){
@@ -55,136 +62,162 @@ document.addEventListener("keyup",event=>{
 });
 
 const gameplayloop=()=>{
-    switch(keypressed){
-        case "rigth":{
-            const position=spaceship.offsetLeft;
-            spaceship.style.left=position+10+"px";
-            break;
-        }
-        case "left":{
-            const position=spaceship.offsetLeft;
-            spaceship.style.left=position-10+"px";
-            break;
-        }
-        default:
-    } 
-
-    bullets.forEach(entity=>{
-            entity.style.top=parseInt(window.getComputedStyle(entity).top)-10+"px";
-            if(parseInt(window.getComputedStyle(entity).top)<0){
-                entity.remove();
-                bullets.pop(entity);
+    if(pv>0){
+        const position=parseInt(window.getComputedStyle(spaceship).left);
+        switch(keypressed){
+            case "rigth":{
+                if((position+1.5*parseInt(window.getComputedStyle(spaceship).width))<window.innerWidth*0.7)
+                    spaceship.style.left=position+spaceshipspeed+"px";
+                break;
             }
-        }
-    );
+            case "left":{
+                if(position>0)
+                    spaceship.style.left=position-spaceshipspeed+"px";
+                break;
+            }
+            default:
+        } 
+    }
 
-    aliens.forEach(entity=>{
-            bullets.forEach(bullet=>{
-                const alientopleftx=parseInt(entity.style.left);
-                const alientoplefty=parseInt(entity.style.top);
-                const bullettopleftx=parseInt(bullet.style.left);
-                const bullettoplefty=parseInt(bullet.style.top);
-
-
-
-                const alienwidth=parseInt(entity.offsetWidth);
-                const alienheigth=parseInt(entity.innerHTML.height);
-                const bulletwidth=parseInt(bullet.offsetWidth);
-                const bulletheigth=parseInt(bullet.offsetHeight);
-
-
-                const alienbottomrigthx=alientopleftx+alienwidth;
-                const alienbottomrigthy=alientoplefty+alienheigth;
-                const bulletbottomrigthx=bullettopleftx+bulletwidth;
-                const bulletbottomrigthy=bullettoplefty+bulletheigth;
+    for (let index = 0; index < bullets.length; index++) {
+        const element = bullets[index];
+        element.style.top=parseInt(window.getComputedStyle(element).top)-10+"px";
+            if(parseInt(window.getComputedStyle(element).top)<0){
+                element.remove();
+                bullets.splice(index,1);
+            }
+    }
 
 
-                
-                console.log("alienwidth= "+alienwidth);
-                console.log("alienheigth= "+alienheigth);
-
-
-                if( !(alientopleftx  >  bulletbottomrigthx )&&!(  alienbottomrigthx  <  bullettopleftx  )&&!(alientoplefty<bulletbottomrigthy)&&!(alienbottomrigthy  >  bullettoplefty))
-                {
-                    // bullet.remove();
-                    // bullets.pop(bullet);
-                    // entity.remove();
-                    // aliens.pop(entity);
+    for(i=0;i<alienrows.length;i++){
+        const row=alienrows[i].aliendiv;
+        for(m=0;m<row.length;m++){
+            const entity=row[m];
+            const rectalien = entity.getBoundingClientRect();
+            for(j=0;j<bullets.length;j++){
+                const bullet=bullets[j];
+                const rectbullet=bullet.getBoundingClientRect();
+                    const element1X = rectalien.left + window.pageXOffset;
+                    const element1Y = rectalien.top + window.pageYOffset;
+                    const element2X = rectbullet.left + window.pageXOffset;
+                    const element2Y = rectbullet.top + window.pageYOffset;
+                    if( !(
+                        element1Y + aliensize < element2Y ||
+                        element1Y > element2Y + rectbullet.height ||
+                        element1X + aliensize < element2X ||
+                        element1X > element2X + rectbullet.width
+                    ))
+                    {
+                        score+=ennemyspeed;
+                        scordisplayer.textContent=score;
+                        const expls=document.createElement("div");
+                        expls.className="alien";
+                        expls.innerHTML="<img src='explosion.png' width='"+aliensize+"' heigth='"+aliensize+"' >"
+                        expls.style.left=entity.style.left;
+                        expls.style.top=entity.style.top;
+                        setTimeout(()=>expls.remove(),200);
+                        gameframe.append(expls);
+                        console.log(bullets);
+                        bullet.remove();
+                        bullets.splice(j,1);
+                        entity.remove();
+                        row.splice(m,1);
+                        console.log(bullets);
+                    }
                 }
-            })
-        });
+        }
+    }
+    
 
     alienrows.forEach(entity=>{
         const row=entity.aliendiv;
-        row.style.top=parseInt(window.getComputedStyle(row).top)+10+"px";
-        switch(entity.alienmove){
-            case "rigth":
-                row.style.left=parseInt(window.getComputedStyle(row).left)+5+"px";
-                if((parseInt(window.getComputedStyle(row).left)+parseInt(row.offsetWidth))>window.innerWidth){
-                    entity.alienmove="left";
-                }
-                break;
-            case "left":
-                row.style.left=parseInt(window.getComputedStyle(row).left)-5+"px";
-                if(parseInt(window.getComputedStyle(row).left)<0){
-                    entity.alienmove="rigth";
-                }    
-        }
+        row.forEach(alien=>{
+            if((parseInt(alien.style.left)+1.5*aliensize)>window.innerWidth*0.7){
+                entity.alienmove="left";
+                return;
+            }
+            if((parseInt(alien.style.left)-0.5*aliensize)<0){
+                entity.alienmove="rigth";
+                return;
+            }
+        })
 
-
-
-        if(parseInt(window.getComputedStyle(row).top)+parseInt(window.getComputedStyle(row).height)>window.innerHeight){
-            const childs=row.childNodes;
-            childs.forEach(alien=>{
+        for(i=0;i<row.length;i++){
+            const alien=row[i];
+            alien.style.top=parseInt(window.getComputedStyle(alien).top)+ennemyspeed+"px";
+            if(parseInt(alien.style.top)+aliensize>window.innerHeight){
                     alien.remove();
+                    row.splice(i,1);
                     pv--;
-                if(pv<0){
-                    clearInterval(run);
-                    clearInterval(difficultychanger);
-                    clearInterval(spawn);
+                    lifedisplayer.textContent=pv;
+                    if(pv<0){
+                        clearInterval(run);
+                        clearInterval(difficultychanger);
+                        clearInterval(spawn);
+                    }
+                    alienrows.splice(alienrows.indexOf(entity),1);
+                    return;
                 }
-            });
-            row.remove();
-            alienrows.pop(entity);
-        }
-    });
+                switch(entity.alienmove){
+                    case "rigth":
+                        alien.style.left=parseInt(alien.style.left)+ennemyspeed+"px";
+                        break;
+                    case "left":
+                        alien.style.left=parseInt(alien.style.left)-ennemyspeed+"px";
+                }
+            }
+        });
 
+    };
 
-};
 
 const run=setInterval(gameplayloop,100);
-const difficultychanger=setInterval(()=>spawntime=spawntime*0.9,1000);
+
 
 
 const spawner=()=>{
-    const alienrow=document.createElement("div");
-    alienrow.className="alienrow";
-    document.body.append(alienrow);
-    alienrows.push(new Alienrow(alienrow));
-    for(i=0;i<20;i++){
-        const newennemy=document.createElement("div");
-        newennemy.className="alien";
-        alienrow.append(newennemy);
-        newennemy.innerHTML='<img src="opponent.png" width='+aliensize+' heigth='+aliensize+'>';
-        newennemy.style.left=window.innerWidth*i/20+"px";
-        aliens.push(newennemy);    
+    if(pv>0&&!spawpaused){
+        if(lvlwave<5){
+        const alienrow=[];
+        alienrows.push(new Alienrow(alienrow));
+        for(i=0;i<numberalien;i++){
+            const newennemy=document.createElement("div");
+            newennemy.className="alien";
+            alienrow.push(newennemy);
+            gameframe.append(newennemy);
+            newennemy.innerHTML='<img src="opponent.png" width='+aliensize+' heigth='+aliensize+'>';
+            console.log(gameframe.style.width);
+            newennemy.style.left=parseInt(window.getComputedStyle(gameframe).width)*i/numberalien+"px";
+            newennemy.style.top=0;
+        }
+        lvlwave++;
     }
-    
+    else{
+        lvlwave=0;
+        spawpaused=true;
+        ennemyspeed+=1;
+        setTimeout(()=>spawpaused=false,10000);
+    }
+}
 };
+
+spawner();
 
 const spawn=setInterval(spawner,spawntime);
 
 
 
-
 const shooting=()=>{
-    const bullet=document.createElement("div");
-    bullet.className="bullet";
-    bullet.style.top=parseInt(window.getComputedStyle(spaceship).top)+"px";
-    bullet.style.left=parseInt(window.getComputedStyle(spaceship).left)+parseInt(window.getComputedStyle(spaceship).width)/2+"px";
-    bullets.push(bullet);
-    document.body.append(bullet);
-    setTimeout(()=>shoot=false,500);
+    if(pv>0){
+        const bullet=document.createElement("div");
+        bullet.className="bullet";
+        bullet.innerHTML="<img src='bullet.png' width='2'>";
+        bullet.style.top=parseInt(window.getComputedStyle(spaceship).top)-10+"px";
+        bullet.style.left=parseInt(window.getComputedStyle(spaceship).left)+parseInt(window.getComputedStyle(spaceship).width)/2+"px";
+        bullets.push(bullet);
+        gameframe.append(bullet);
+        setTimeout(()=>shoot=false,shootdelay);
+    }
 };
 
 

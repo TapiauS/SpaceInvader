@@ -8,28 +8,37 @@
     height: 5%;
 }
 
+.score{
+    width:30%;
+    height:900px;
+}
+
+
+.gameframe{
+    width: 70%;
+    height: 900px;
+    background-color: #31133B;
+    position: relative;
+}
+
 
 .bullet{
     position:absolute;
-    background-image: url("bullet.png");
-    background-size: cover;
-    height: 5%;
-    width:1%;
+    /* background-image: url("bullet.png"); */
+    /* background-size: cover; */
 }
 
 
 .alien{
     position: absolute;
-    height: 5%;
-    width:1%;
+
 }
 
-.alienrow{
-    position: relative;
-    /* width: fit-content; */
-}
 
 body{
-    background-color: #31133B;
+    
     text-align: center;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
 }
