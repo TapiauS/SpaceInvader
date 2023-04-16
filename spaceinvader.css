@@ -34,19 +34,15 @@
 
 .bullet{
     position:absolute;
-    /* background-image: url("bullet.png"); */
-    /* background-size: cover; */
 }
 
 
 .alien{
     position: absolute;
-
 }
 
 
 body{
-    
     text-align: center;
     display: flex;
     flex-direction: row;
