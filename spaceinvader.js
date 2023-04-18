@@ -79,7 +79,7 @@ const intersect=(entity1,entity2)=>{
     const element2X = rect2.left + window.pageXOffset;
     const element2Y = rect2.top + window.pageYOffset;
     return !(
-        element1Y + rect1.width < element2Y ||
+        element1Y + rect1.height < element2Y ||
         element1Y > element2Y + rect2.height ||
         element1X + rect1.width < element2X ||
         element1X > element2X + rect2.width
@@ -144,7 +144,7 @@ document.addEventListener("keydown",event=>{
                     ultlaser.remove();
                     ultiload=0;
                     ultbar.style.width=0+"%";
-                    ultbar.className="loadbar";
+                    ultbar.className="progress-bar";
                     ultbar.innerHTML="";
                 },5000);
             }    
@@ -178,7 +178,6 @@ const gameplayloop=()=>{
                 row.forEach(alien=>{
                     const shootingproba=Math.random();
                     if(shootingproba<1/opponentshootrate){
-                        console.log("alien shoot");
                         const alienbullet=document.createElement("div");
                         alienbullet.className="bullet";
                         alienbullet.style.top=alien.style.top;
@@ -194,7 +193,7 @@ const gameplayloop=()=>{
                 const bullet = ennemybullets[index];
                 bullet.style.top=parseInt(bullet.style.top)+ennemyspeed*5+"px";
                 if((parseInt(bullet.style.top)+bullet.offsetHeight)>gameframe.offsetHeight){
-                    console.log("je sors");
+                    
                     ennemybullets.splice(index,1);
                     bullet.remove();
                 }
@@ -240,7 +239,6 @@ const gameplayloop=()=>{
                     const entity=row[m];
                     for(j=0;j<bullets.length;j++){
                         const bullet=bullets[j];
-                        
                                if(intersect(entity,bullet) )
                             {
                                 score+=ennemyspeed;
@@ -253,7 +251,7 @@ const gameplayloop=()=>{
                                     }
                                 }
                                 const givebonus=Math.random()  ;
-                                console.log(givebonus);
+                                
                                 if(givebonus>0.9){
                                     const bonusindex=Math.floor(Math.random()*bonustypes.length);
                                     const bonustype=bonustypes[bonusindex];
@@ -274,8 +272,8 @@ const gameplayloop=()=>{
                                 row.splice(m,1);
                             }
                         }
-                        console.log(intersect(ultlaser,entity));
                         if(ultrunning && intersect(ultlaser,entity)){
+                            console.log("aaaaaaaaahhhahahahahahhahahh");
                             score+=ennemyspeed;
                             const givebonus=Math.random()  ;
                                 if(givebonus>0.9){
@@ -295,7 +293,6 @@ const gameplayloop=()=>{
                                 entity.remove();
                                 row.splice(m,1);
                         }
-                        
                 }
             }   
                  
@@ -305,7 +302,7 @@ const gameplayloop=()=>{
                 if(intersect(bonusdiv,spaceship)){
                     switch(bonustype){
                         case "life":{
-                            console.log("found life");
+                            
                             if(pv<10){
                                 pv++;
                                 lifedisplayer.textContent=pv;
@@ -314,7 +311,7 @@ const gameplayloop=()=>{
                         }
                         case "faster":{
                             if(!activbonuss.includes("faster")){
-                                console.log("faster");
+                                
                                 activbonuss.push(bonustype);
                                 bulletspeed=2*bulletspeed;
                                 setTimeout(()=>{
@@ -325,7 +322,7 @@ const gameplayloop=()=>{
                         }
                         case "larger":{
                             if(!activbonuss.includes("larger")){
-                                console.log("larger");
+                                
                                 activbonuss.push(bonustype);
                                 bulletsize=4*bulletsize;
                                 setTimeout(()=>{
@@ -449,7 +446,7 @@ const spawner=()=>{
 //             alienrow.push(newennemy);
 //             gameframe.append(newennemy);
 //             newennemy.innerHTML='<img src="opponent.png" width='+aliensize+' heigth='+aliensize+'>';
-//             console.log(gameframe.style.width);
+//             
 //             newennemy.style.left=parseInt(window.getComputedStyle(gameframe).width)*i/numberalien+"px";
 //             newennemy.style.top=0;
 //         }
